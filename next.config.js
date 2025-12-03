@@ -9,10 +9,7 @@ const nextConfig = {
   //     },
   //   ];
   // },
-  experimental: {
-    serverActions: true,
-    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt'],
-  },
+  serverExternalPackages: ['@prisma/client', 'bcrypt'],
 };
 
 module.exports = nextConfig;

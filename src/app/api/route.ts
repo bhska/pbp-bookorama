@@ -1,11 +1,10 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]/route';
+import { auth } from './auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     return new NextResponse(JSON.stringify({ authenticated: false }), {

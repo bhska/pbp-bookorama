@@ -3,10 +3,8 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const orderId = params.id;
 
   const order = await prisma.orders.findUnique({

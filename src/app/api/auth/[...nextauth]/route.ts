@@ -1,9 +1,9 @@
 import prisma from '@/lib/prisma';
 import { compare } from 'bcrypt';
-import NextAuth, { type NextAuthOptions } from 'next-auth';
+import NextAuth, { type NextAuthConfig } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthConfig = {
   session: {
     strategy: 'jwt',
   },
@@ -78,5 +78,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const { handlers, auth } = NextAuth(authOptions);
+
+export const { GET, POST } = handlers;
+export { auth };

@@ -4,10 +4,8 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const categoryId = params.id;
 
   const category = await prisma.categories.findUnique({
@@ -23,10 +21,8 @@ export async function GET(
   });
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const categoryId = params.id;
 
   await prisma.categories.delete({
@@ -41,10 +37,13 @@ export async function DELETE(
   });
 }
 
-export async function PUT(
-  request: Request,
-  { params, body }: { params: { id: string }; body: any }
-) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }>; body: any }) {
+  const params = await props.params;
+
+  const {
+    body
+  } = props;
+
   const categoryId = params.id;
   const req = await request.json();
 
