@@ -52,10 +52,8 @@ export default function OrdersPage() {
     }
   };
 
-  console.log(open, 'ini id');
-
   return (
-    <div className='w-full flex flex-col p-0'>
+    <div className='w-full flex flex-col gap-6'>
       <Dialog open={open !== null} onOpenChange={() => handleOpen(null)}>
         <DialogContent>
           <DialogHeader>
@@ -150,7 +148,7 @@ export default function OrdersPage() {
             ? (ordersData as any)?.data.map((order: Orders) => (
                 <Card
                   key={order.id}
-                  className='w-full flex-1 flex flex-col p-4'
+                  className='w-full flex flex-col p-4 shadow-sm'
                   onClick={() => handleOpen(order.id)}
                 >
                   <div className='flex justify-between items-center gap-4'>
@@ -163,7 +161,7 @@ export default function OrdersPage() {
                       </span>
                     </div>
                     <div className='flex flex-col'>
-                      <span className='font-bold'>
+                      <span className='font-bold text-sm md:text-base'>
                         {new Intl.NumberFormat('id-ID', {
                           style: 'currency',
                           currency: 'IDR',
@@ -174,7 +172,7 @@ export default function OrdersPage() {
                 </Card>
               ))
             : [1, 2, 3, 4].map((order) => (
-                <Skeleton key={order} className='w-full h-32 bg-gray-200' />
+                <Skeleton key={order} className='w-full h-32 bg-gray-200 rounded-md' />
               ))}
         </div>
       </div>

@@ -6,13 +6,12 @@ import { cn } from '@/lib/utils';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next-nprogress-bar';
-import { IconShoppingCart, IconTrash, IconHome, IconList } from '@tabler/icons-react';
+import { IconHome, IconList, IconLogout, IconShoppingCart, IconTrash } from '@tabler/icons-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Books } from '@prisma/client';
 import { useCart } from '@/store/cart';
@@ -69,13 +68,13 @@ export default function RootLayout({
   };
 
   return (
-    <div className='container max-w-2xl mx-auto min-h-screen flex justify-center pt-[74px] max-[445px]:pb-24'>
-      <div className='fixed top-0 w-full mx-auto border border-gray-100 bg-white/50 backdrop-blur-sm z-50'>
-        <div className='flex container mx-auto max-w-2xl py-4 justify-between items-center px-4 md:px-0'>
+    <div className='container max-w-2xl mx-auto min-h-screen flex justify-center pt-[74px] pb-28 md:pb-12 px-4'>
+      <div className='fixed top-0 left-0 right-0 border-b border-gray-100 bg-white/70 backdrop-blur-lg z-50'>
+        <div className='flex container mx-auto max-w-2xl py-3 md:py-4 justify-between items-center px-4'>
           <div className='flex gap-4 items-center'>
             <span className='font-bold'>Bookorama</span>
 
-            <div className='flex gap-2 max-[445px]:hidden'>
+            <div className='hidden gap-2 md:flex'>
               {nav.map((item) => (
                 <Button
                   size='sm'
@@ -98,7 +97,7 @@ export default function RootLayout({
             <Button
               size='sm'
               variant='outline'
-              className='flex gap-2 relative max-[445px]:hidden'
+              className='relative hidden gap-2 md:flex'
               onClick={handleOpen}
             >
               <IconShoppingCart size={16} />
@@ -112,7 +111,7 @@ export default function RootLayout({
               </Badge>
             </Button>
 
-            <Button size='sm' onClick={() => signOut()} className="flex max-[445px]:hidden">
+            <Button size='sm' onClick={() => signOut()} className='hidden md:flex'>
               Keluar
             </Button>
           </div>
@@ -120,52 +119,58 @@ export default function RootLayout({
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 hidden max-[445px]:flex justify-around items-center z-50 pb-safe">
+      <div className='fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 md:hidden flex justify-around items-center z-50 pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.04)]'>
         <Button
-          variant="ghost"
-          size="icon"
-          className={cn("flex flex-col items-center gap-1 h-auto", selectedNav('/app') && "text-primary")}
+          variant='ghost'
+          size='sm'
+          className={cn(
+            'flex flex-col items-center gap-1 h-auto min-w-[70px] text-xs font-medium text-gray-600',
+            selectedNav('/app') && 'text-primary'
+          )}
           onClick={() => router.push('/app')}
         >
           <IconHome size={24} />
-          <span className="text-[10px]">Beranda</span>
+          <span className='text-[11px]'>Beranda</span>
         </Button>
         
         <Button
-          variant="ghost"
-          size="icon"
-          className={cn("flex flex-col items-center gap-1 h-auto", selectedNav('/app/orders') && "text-primary")}
+          variant='ghost'
+          size='sm'
+          className={cn(
+            'flex flex-col items-center gap-1 h-auto min-w-[70px] text-xs font-medium text-gray-600',
+            selectedNav('/app/orders') && 'text-primary'
+          )}
           onClick={() => router.push('/app/orders')}
         >
           <IconList size={24} />
-          <span className="text-[10px]">Pesanan</span>
+          <span className='text-[11px]'>Pesanan</span>
         </Button>
 
         <Button
-          variant="ghost"
-          size="icon"
-          className="flex flex-col items-center gap-1 h-auto relative"
+          variant='ghost'
+          size='sm'
+          className='flex flex-col items-center gap-1 h-auto relative min-w-[70px] text-xs font-medium text-gray-600'
           onClick={handleOpen}
         >
-          <div className="relative">
+          <div className='relative'>
             <IconShoppingCart size={24} />
             {cart.length > 0 && (
-              <Badge className="absolute -top-2 -right-2 px-1 h-4 min-w-[1rem] flex items-center justify-center text-[10px]" variant="destructive">
+              <Badge className='absolute -top-2 -right-2 px-1 h-4 min-w-4 flex items-center justify-center text-[10px]' variant='destructive'>
                 {cart.length}
               </Badge>
             )}
           </div>
-          <span className="text-[10px]">Keranjang</span>
+          <span className='text-[11px]'>Keranjang</span>
         </Button>
 
         <Button
-          variant="ghost"
-          size="icon"
-          className="flex flex-col items-center gap-1 h-auto"
+          variant='ghost'
+          size='sm'
+          className='flex flex-col items-center gap-1 h-auto min-w-[70px] text-xs font-medium text-gray-600'
           onClick={() => signOut()}
         >
-          <IconTrash size={24} className="rotate-180" /> {/* Using IconTrash as logout placeholder if needed, or just text */}
-          <span className="text-[10px]">Keluar</span>
+          <IconLogout size={24} />
+          <span className='text-[11px]'>Keluar</span>
         </Button>
       </div>
 

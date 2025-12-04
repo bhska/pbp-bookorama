@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
@@ -96,17 +95,16 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
       message: 'Book updated successfully',
     });
   } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError)
-      if (e.code === 'P2002') {
-        return NextResponse.json(
-          {
-            status: 'error',
-            message: `Sudah ada buku dengan ISBN ${booksId}. Silahkan coba lagi dengan ISBN yang berbeda`,
-            field: 'isbn',
-          },
-          { status: 400 }
-        );
-      }
+    if (e.code === 'P2002') {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message: `Sudah ada buku dengan ISBN ${booksId}. Silahkan coba lagi dengan ISBN yang berbeda`,
+          field: 'isbn',
+        },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json(
       {

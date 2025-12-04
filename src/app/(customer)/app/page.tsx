@@ -57,7 +57,7 @@ export default function Home() {
   };
 
   return (
-    <div className='w-full flex flex-col p-0 gap-4'>
+    <div className='w-full flex flex-col gap-6'>
       <Dialog open={open !== null} onOpenChange={() => handleOpen(null)}>
         <DialogContent>
           <DialogHeader>
@@ -112,12 +112,12 @@ export default function Home() {
       <div className='flex flex-col gap-4'>
         <h3 className='font-bold text-lg'>Buku Terbaru</h3>
 
-        <div className='flex gap-4 w-full'>
+        <div className='flex gap-4 w-full overflow-x-auto pb-2 snap-x snap-mandatory -mx-2 px-2'>
           {!booksLoading
             ? (booksData as any)?.data.slice(0, 3).map((book: any) => (
                 <Card
                   key={book.isbn}
-                  className='w-full flex-1 flex flex-col p-4 gap-4 justify-between'
+                  className='min-w-[220px] sm:min-w-[260px] flex-1 flex flex-col p-4 gap-4 justify-between snap-start shadow-sm'
                   onClick={() => handleOpen(book.isbn)}
                 >
                   <div className='flex flex-col'>
@@ -138,7 +138,7 @@ export default function Home() {
 
                     <Button
                       size='sm'
-                      className='flex gap-1 mt-2'
+                      className='flex gap-1 mt-2 w-full justify-center'
                       variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
@@ -151,7 +151,7 @@ export default function Home() {
                 </Card>
               ))
             : [1, 2, 3].map((book) => (
-                <Skeleton key={book} className='w-full h-32 bg-gray-200' />
+                <Skeleton key={book} className='min-w-[220px] h-32 bg-gray-200 rounded-md' />
               ))}
         </div>
       </div>
@@ -159,12 +159,12 @@ export default function Home() {
       <div className='flex flex-col gap-4 w-full'>
         <h3 className='font-bold text-lg'>Semua Buku</h3>
 
-        <div className='grid grid-cols-2 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
           {!booksLoading
             ? (booksData as any)?.data.map((book: any) => (
                 <Card
                   key={book.isbn}
-                  className='w-full flex-1 flex flex-col p-4 gap-4 justify-between'
+                  className='w-full flex flex-col p-4 gap-4 justify-between shadow-sm'
                   onClick={() => handleOpen(book.isbn)}
                 >
                   <div className='flex flex-col'>
@@ -185,7 +185,7 @@ export default function Home() {
 
                     <Button
                       size='sm'
-                      className='flex gap-1 mt-2'
+                      className='flex gap-1 mt-2 w-full justify-center'
                       variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
@@ -198,7 +198,7 @@ export default function Home() {
                 </Card>
               ))
             : [1, 2, 3, 4].map((book) => (
-                <Skeleton key={book} className='w-full h-32 bg-gray-200' />
+                <Skeleton key={book} className='w-full h-32 bg-gray-200 rounded-md' />
               ))}
         </div>
       </div>

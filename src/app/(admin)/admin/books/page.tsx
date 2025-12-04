@@ -72,14 +72,16 @@ export default function BooksPage() {
 
   const isLoading = categoriesLoading || booksLoading;
 
-  const handleOpen = (value: string | null) => {
-    resetForm();
-    if (open !== null) {
+  const handleOpen = (value: string | number | null) => {
+    if (value === null) {
+      resetForm();
       setOpen(null);
+      return;
     }
-    if (value) {
-      setOpen(value);
-    }
+
+    // only used for Add flow; edit flow sets values explicitly
+    resetForm();
+    setOpen(value);
   };
 
   const resetForm = () => {
@@ -174,18 +176,24 @@ export default function BooksPage() {
 
   const handleEdit = async (id: string) => {
     try {
-      handleOpen(id);
       const res = await axios.get(`/api/book/${id}`);
 
-      form.setValue('isbn', res.data.data.isbn);
-      form.setValue('title', res.data.data.title);
-      form.setValue('author', res.data.data.author);
-      form.setValue('price', res.data.data.price);
-      form.setValue('category', res.data.data.categoryId.toString());
+      form.reset({
+        isbn: res.data.data.isbn,
+        title: res.data.data.title,
+        author: res.data.data.author,
+        price: res.data.data.price.toString(),
+        category: res.data.data.categoryId.toString(),
+      });
+      setError(null);
+      setOpen(id);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const getCategoryName = (id: number) =>
+    categoriesData?.data.find((c: Categories) => c.id === id)?.name ?? '-';
 
   return (
     <div className='w-full flex flex-col p-0'>
@@ -321,8 +329,51 @@ export default function BooksPage() {
         </Button>
       </div>
 
+      {/* Mobile: card list */}
       {!isLoading ? (
-        <Card className='mt-4 p-4 pt-0'>
+        <div className='mt-4 flex flex-col gap-3 md:hidden'>
+          {booksData.data.map((book: any) => (
+            <Card key={book.isbn} className='p-4 shadow-sm'>
+              <div className='flex flex-col gap-1'>
+                <span className='font-semibold text-sm'>{book.title}</span>
+                <span className='text-xs text-gray-500'>
+                  {book.author} • {getCategoryName(book.categoryId)}
+                </span>
+              </div>
+              <div className='flex justify-between items-center mt-3'>
+                <div className='flex flex-col text-sm'>
+                  <span className='font-bold'>
+                    {new Intl.NumberFormat('id-ID', {
+                      style: 'currency',
+                      currency: 'IDR',
+                    }).format(book.price)}
+                  </span>
+                  <span className='text-xs text-gray-500'>
+                    Ditambahkan {new Date(book.createdAt).toLocaleDateString('id-ID')}
+                  </span>
+                </div>
+                <div className='flex gap-2'>
+                  <Button size='sm' variant='outline' onClick={() => handleEdit(book.isbn)}>
+                    Edit
+                  </Button>
+                  <Button size='sm' variant='destructive' onClick={() => handleDelete(book.isbn)}>
+                    Hapus
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className='mt-4 flex flex-col gap-3 md:hidden'>
+          <Skeleton className='h-28 bg-gray-200 rounded-md' />
+          <Skeleton className='h-28 bg-gray-200 rounded-md' />
+        </div>
+      )}
+
+      {/* Desktop: table */}
+      {!isLoading ? (
+        <Card className='mt-4 p-4 pt-0 hidden md:block'>
           <BooksDataTable
             data={booksData.data}
             handleDelete={(id) => handleDelete(id)}
@@ -331,7 +382,7 @@ export default function BooksPage() {
           />
         </Card>
       ) : (
-        <Skeleton className='mt-4 h-96 bg-gray-200' />
+        <Skeleton className='mt-4 h-96 bg-gray-200 hidden md:block' />
       )}
     </div>
   );
