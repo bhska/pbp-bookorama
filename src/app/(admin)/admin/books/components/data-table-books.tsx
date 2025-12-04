@@ -47,7 +47,7 @@ dayjs.locale('id');
 
 type BooksDataTableProps = {
   data: Books[];
-  handleDelete: (id: string) => void;
+  handleDelete: (book: Books) => void;
   handleEdit: (id: string) => void;
   categories: Categories[];
 };
@@ -189,7 +189,7 @@ export function BooksDataTable({
               </DropdownMenuItem>
               <DropdownMenuItem
                 className='text-red-600'
-                onClick={() => handleDelete(payment.isbn)}
+                onClick={() => handleDelete(payment)}
               >
                 Delete
               </DropdownMenuItem>

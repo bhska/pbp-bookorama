@@ -7,20 +7,28 @@ import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next-nprogress-bar';
 import { IconHome, IconList, IconLogout, IconShoppingCart, IconTrash } from '@tabler/icons-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Books } from '@prisma/client';
 import { useCart } from '@/store/cart';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 
 export default function RootLayout({
   children,
@@ -44,6 +52,7 @@ export default function RootLayout({
   const { cart, removeFromCart, clearCart } = useCart();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const handleOpen = () => setOpen(!open);
 
@@ -66,6 +75,14 @@ export default function RootLayout({
       toast.error('Gagal membuat pesanan');
     }
   };
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px)');
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   return (
     <div className='container max-w-2xl mx-auto min-h-screen flex justify-center pt-[74px] pb-28 md:pb-12 px-4'>
@@ -132,7 +149,7 @@ export default function RootLayout({
           <IconHome size={24} />
           <span className='text-[11px]'>Beranda</span>
         </Button>
-        
+
         <Button
           variant='ghost'
           size='sm'
@@ -174,13 +191,16 @@ export default function RootLayout({
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Keranjang</DialogTitle>
-          </DialogHeader>
+      {isDesktop ? (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Keranjang</DialogTitle>
+              <DialogDescription>
+                Tinjau buku yang akan dipesan sebelum checkout.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className='flex flex-col gap-4'>
             {cart.length > 0 ? (
               <>
                 <ScrollArea className='flex flex-col h-72'>
@@ -221,7 +241,7 @@ export default function RootLayout({
                     </div>
                   ))}
                 </ScrollArea>
-                <div className='flex justify-between'>
+                <div className='flex justify-between pt-4'>
                   <span className='font-semibold'>Total</span>
                   <span className='font-semibold'>
                     {new Intl.NumberFormat('id-ID', {
@@ -234,7 +254,7 @@ export default function RootLayout({
                 </div>
                 <Button
                   size='sm'
-                  className='mt-2'
+                  className='mt-3 w-full'
                   onClick={() => handleOrder()}
                   loading={isLoading}
                 >
@@ -242,17 +262,100 @@ export default function RootLayout({
                 </Button>
               </>
             ) : (
-              <div className='flex items-center justify-center h-24'>
+              <div className='flex items-center justify-center h-24 px-4'>
                 <span className='font-semibold text-sm text-center'>
                   Keranjang kosong
                 </span>
               </div>
             )}
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className='pb-6'>
+            <DrawerHeader className='px-4 text-left'>
+              <DrawerTitle>Keranjang</DrawerTitle>
+              <DrawerDescription>
+                Tinjau buku yang akan dipesan sebelum checkout.
+              </DrawerDescription>
+            </DrawerHeader>
 
-      <div className='py-4 w-full'>{children}</div>
+            {cart.length > 0 ? (
+              <>
+                <div className='flex flex-col gap-4 px-4'>
+                  <ScrollArea className='flex flex-col h-72'>
+                    {cart.map((book: Books) => (
+                      <div
+                        key={book.isbn}
+                        className='w-full flex-1 flex-col flex'
+                      >
+                        <div className='flex w-full items-center gap-4'>
+                          <div className='flex flex-1 flex-col'>
+                            <span className='font-semibold text-sm'>
+                              {book.title}
+                            </span>
+                            <span className='text-xs text-gray-400'>
+                              {book.author}
+                            </span>
+                          </div>
+                          <div className='flex flex-col'>
+                            <span className='font-bold text-sm'>
+                              {new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                              }).format(book.price)}
+                            </span>
+                          </div>
+                          <Button
+                            size='sm'
+                            className='flex gap-1'
+                            variant='outline'
+                            onClick={() => removeFromCart(book)}
+                          >
+                            <IconTrash size={14} stroke={3} />
+                          </Button>
+                        </div>
+                        {cart.indexOf(book) !== cart.length - 1 && (
+                          <Separator className='my-2' />
+                        )}
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+                <div className='px-4'>
+                  <div className='flex justify-between'>
+                    <span className='font-semibold'>Total</span>
+                    <span className='font-semibold'>
+                      {new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                      }).format(
+                        cart.reduce((total, book) => total + book.price, 0)
+                      )}
+                    </span>
+                  </div>
+                  <Button
+                    size='sm'
+                    className='mt-3 w-full'
+                    onClick={() => handleOrder()}
+                    loading={isLoading}
+                  >
+                    Beli
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className='flex items-center justify-center h-24 px-4'>
+                <span className='font-semibold text-sm text-center'>
+                  Keranjang kosong
+                </span>
+              </div>
+            )}
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      <div className='pb-4 py-2 w-full'>{children}</div>
     </div>
   );
 }

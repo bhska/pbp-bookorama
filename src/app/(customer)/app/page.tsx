@@ -8,16 +8,34 @@ import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useState } from 'react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
+import { useEffect } from 'react';
 
 export default function Home() {
   const [open, setOpen] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px)');
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   const handleOpen = (value: string | null) => {
     if (open !== null) {
@@ -58,56 +76,120 @@ export default function Home() {
 
   return (
     <div className='w-full flex flex-col gap-6'>
-      <Dialog open={open !== null} onOpenChange={() => handleOpen(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Detail Buku</DialogTitle>
-          </DialogHeader>
-          <div className='flex flex-col gap-3'>
-            <div className='flex justify-between w-full mt-4'>
-              <span className='font-semibold'>Judul</span>
-              {bookLoading ? (
-                <Skeleton className='h-3 w-9' />
-              ) : (
-                <span className='text-right'>{bookData?.data.title}</span>
-              )}
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='font-semibold'>Pengarang</span>
-              {bookLoading ? (
-                <Skeleton className='h-3 w-9' />
-              ) : (
-                <span className='text-right'>{bookData?.data.author}</span>
-              )}
-            </div>
-            <div className='flex justify-between w-full'>
-              <span className='font-semibold'>Harga</span>
-              {bookLoading ? (
-                <Skeleton className='h-3 w-9' />
-              ) : (
-                <span className='text-right'>
-                  {new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                  }).format(bookData?.data.price)}
-                </span>
-              )}
-            </div>
+      {isDesktop ? (
+        <Dialog open={open !== null} onOpenChange={() => handleOpen(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Detail Buku</DialogTitle>
+              <DialogDescription>
+                Lihat ringkasan buku sebelum menambahkannya.
+              </DialogDescription>
+            </DialogHeader>
+            <div className='flex flex-col gap-3 pb-2'>
+              <div className='flex justify-between w-full mt-2'>
+                <span className='font-semibold'>Judul</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>{bookData?.data.title}</span>
+                )}
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='font-semibold'>Pengarang</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>{bookData?.data.author}</span>
+                )}
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='font-semibold'>Harga</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>
+                    {new Intl.NumberFormat('id-ID', {
+                      style: 'currency',
+                      currency: 'IDR',
+                    }).format(bookData?.data.price)}
+                  </span>
+                )}
+              </div>
 
-            <Button
-              size='sm'
-              className='flex gap-1 mt-2'
-              variant='outline'
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCartHandler(bookData.data);
-              }}
-            >
-              <IconPlus size={14} stroke={3} /> Tambah
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+              <Button
+                size='sm'
+                className='flex gap-1 mt-2'
+                variant='outline'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCartHandler(bookData.data);
+                }}
+              >
+                <IconPlus size={14} stroke={3} /> Tambah
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Drawer
+          open={open !== null}
+          onOpenChange={(value) => {
+            if (!value) handleOpen(null);
+          }}
+        >
+          <DrawerContent className='pb-6'>
+            <DrawerHeader className='px-4 text-left'>
+              <DrawerTitle>Detail Buku</DrawerTitle>
+              <DrawerDescription>
+                Lihat ringkasan buku sebelum menambahkannya.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className='flex flex-col gap-3 px-4 pb-2'>
+              <div className='flex justify-between w-full mt-2'>
+                <span className='font-semibold'>Judul</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>{bookData?.data.title}</span>
+                )}
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='font-semibold'>Pengarang</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>{bookData?.data.author}</span>
+                )}
+              </div>
+              <div className='flex justify-between w-full'>
+                <span className='font-semibold'>Harga</span>
+                {bookLoading ? (
+                  <Skeleton className='h-3 w-9' />
+                ) : (
+                  <span className='text-right'>
+                    {new Intl.NumberFormat('id-ID', {
+                      style: 'currency',
+                      currency: 'IDR',
+                    }).format(bookData?.data.price)}
+                  </span>
+                )}
+              </div>
+
+              <Button
+                size='sm'
+                className='flex gap-1 mt-2'
+                variant='outline'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCartHandler(bookData.data);
+                }}
+              >
+                <IconPlus size={14} stroke={3} /> Tambah
+              </Button>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
 
       <div className='flex flex-col gap-4'>
         <h3 className='font-bold text-lg'>Buku Terbaru</h3>

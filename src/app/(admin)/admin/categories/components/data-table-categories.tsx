@@ -26,7 +26,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -43,7 +42,7 @@ import { cn } from '@/lib/utils';
 
 type CategoriesDataTableProps = {
   data: Categories[];
-  handleDelete: (id: number) => void;
+  handleDelete: (category: Categories) => void;
   handleEdit: (id: number) => void;
 };
 
@@ -89,7 +88,7 @@ export function CategoriesDataTable({
               </DropdownMenuItem>
               <DropdownMenuItem
                 className='text-red-600'
-                onClick={() => handleDelete(payment.id)}
+                onClick={() => handleDelete(payment)}
               >
                 Delete
               </DropdownMenuItem>

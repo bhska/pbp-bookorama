@@ -135,7 +135,7 @@ export default function RootLayout({
         </Button>
       </div>
 
-      <div className='py-4 w-full'>{children}</div>
+      <div className='pb-4 py-2 w-full'>{children}</div>
     </div>
   );
 }
