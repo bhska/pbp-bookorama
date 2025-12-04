@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next-nprogress-bar';
-import { IconShoppingCart, IconTrash } from '@tabler/icons-react';
+import { IconShoppingCart, IconTrash, IconHome, IconList } from '@tabler/icons-react';
 import {
   Dialog,
   DialogContent,
@@ -69,13 +69,13 @@ export default function RootLayout({
   };
 
   return (
-    <div className='container max-w-2xl mx-auto min-h-screen flex justify-center pt-[74px]'>
-      <div className='fixed top-0 w-full mx-auto border border-gray-100 bg-white/50 backdrop-blur-sm'>
-        <div className='flex container mx-auto max-w-2xl py-4 justify-between items-center'>
+    <div className='container max-w-2xl mx-auto min-h-screen flex justify-center pt-[74px] max-[445px]:pb-24'>
+      <div className='fixed top-0 w-full mx-auto border border-gray-100 bg-white/50 backdrop-blur-sm z-50'>
+        <div className='flex container mx-auto max-w-2xl py-4 justify-between items-center px-4 md:px-0'>
           <div className='flex gap-4 items-center'>
             <span className='font-bold'>Bookorama</span>
 
-            <div className='flex gap-2'>
+            <div className='flex gap-2 max-[445px]:hidden'>
               {nav.map((item) => (
                 <Button
                   size='sm'
@@ -95,106 +95,157 @@ export default function RootLayout({
               <AvatarFallback>{data?.user?.name?.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <Dialog open={open} onOpenChange={handleOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  size='sm'
-                  variant='outline'
-                  className='flex gap-2 relative'
-                >
-                  <IconShoppingCart size={16} />
-                  Keranjang
-                  <Badge
-                    className='absolute -top-3 -right-3 px-2'
-                    variant='default'
-                    suppressHydrationWarning
-                  >
-                    {cart.length}
-                  </Badge>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Keranjang</DialogTitle>
-                </DialogHeader>
+            <Button
+              size='sm'
+              variant='outline'
+              className='flex gap-2 relative max-[445px]:hidden'
+              onClick={handleOpen}
+            >
+              <IconShoppingCart size={16} />
+              Keranjang
+              <Badge
+                className='absolute -top-3 -right-3 px-2'
+                variant='default'
+                suppressHydrationWarning
+              >
+                {cart.length}
+              </Badge>
+            </Button>
 
-                <div className='flex flex-col gap-4'>
-                  {cart.length > 0 ? (
-                    <>
-                      <ScrollArea className='flex flex-col h-72'>
-                        {cart.map((book: Books) => (
-                          <div
-                            key={book.isbn}
-                            className='w-full flex-1 flex-col flex'
-                          >
-                            <div className='flex w-full items-center gap-4'>
-                              <div className='flex flex-1 flex-col'>
-                                <span className='font-semibold text-sm'>
-                                  {book.title}
-                                </span>
-                                <span className='text-xs text-gray-400'>
-                                  {book.author}
-                                </span>
-                              </div>
-                              <div className='flex flex-col'>
-                                <span className='font-bold text-sm'>
-                                  {new Intl.NumberFormat('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                  }).format(book.price)}
-                                </span>
-                              </div>
-                              <Button
-                                size='sm'
-                                className='flex gap-1'
-                                variant='outline'
-                                onClick={() => removeFromCart(book)}
-                              >
-                                <IconTrash size={14} stroke={3} />
-                              </Button>
-                            </div>
-                            {cart.indexOf(book) !== cart.length - 1 && (
-                              <Separator className='my-2' />
-                            )}
-                          </div>
-                        ))}
-                      </ScrollArea>
-                      <div className='flex justify-between'>
-                        <span className='font-semibold'>Total</span>
-                        <span className='font-semibold'>
-                          {new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                          }).format(
-                            cart.reduce((total, book) => total + book.price, 0)
-                          )}
-                        </span>
-                      </div>
-                      <Button
-                        size='sm'
-                        className='mt-2'
-                        onClick={() => handleOrder()}
-                        loading={isLoading}
-                      >
-                        Beli
-                      </Button>
-                    </>
-                  ) : (
-                    <div className='flex items-center justify-center h-24'>
-                      <span className='font-semibold text-sm text-center'>
-                        Keranjang kosong
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Button size='sm' onClick={() => signOut()}>
+            <Button size='sm' onClick={() => signOut()} className="flex max-[445px]:hidden">
               Keluar
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 hidden max-[445px]:flex justify-around items-center z-50 pb-safe">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn("flex flex-col items-center gap-1 h-auto", selectedNav('/app') && "text-primary")}
+          onClick={() => router.push('/app')}
+        >
+          <IconHome size={24} />
+          <span className="text-[10px]">Beranda</span>
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn("flex flex-col items-center gap-1 h-auto", selectedNav('/app/orders') && "text-primary")}
+          onClick={() => router.push('/app/orders')}
+        >
+          <IconList size={24} />
+          <span className="text-[10px]">Pesanan</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="flex flex-col items-center gap-1 h-auto relative"
+          onClick={handleOpen}
+        >
+          <div className="relative">
+            <IconShoppingCart size={24} />
+            {cart.length > 0 && (
+              <Badge className="absolute -top-2 -right-2 px-1 h-4 min-w-[1rem] flex items-center justify-center text-[10px]" variant="destructive">
+                {cart.length}
+              </Badge>
+            )}
+          </div>
+          <span className="text-[10px]">Keranjang</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="flex flex-col items-center gap-1 h-auto"
+          onClick={() => signOut()}
+        >
+          <IconTrash size={24} className="rotate-180" /> {/* Using IconTrash as logout placeholder if needed, or just text */}
+          <span className="text-[10px]">Keluar</span>
+        </Button>
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Keranjang</DialogTitle>
+          </DialogHeader>
+
+          <div className='flex flex-col gap-4'>
+            {cart.length > 0 ? (
+              <>
+                <ScrollArea className='flex flex-col h-72'>
+                  {cart.map((book: Books) => (
+                    <div
+                      key={book.isbn}
+                      className='w-full flex-1 flex-col flex'
+                    >
+                      <div className='flex w-full items-center gap-4'>
+                        <div className='flex flex-1 flex-col'>
+                          <span className='font-semibold text-sm'>
+                            {book.title}
+                          </span>
+                          <span className='text-xs text-gray-400'>
+                            {book.author}
+                          </span>
+                        </div>
+                        <div className='flex flex-col'>
+                          <span className='font-bold text-sm'>
+                            {new Intl.NumberFormat('id-ID', {
+                              style: 'currency',
+                              currency: 'IDR',
+                            }).format(book.price)}
+                          </span>
+                        </div>
+                        <Button
+                          size='sm'
+                          className='flex gap-1'
+                          variant='outline'
+                          onClick={() => removeFromCart(book)}
+                        >
+                          <IconTrash size={14} stroke={3} />
+                        </Button>
+                      </div>
+                      {cart.indexOf(book) !== cart.length - 1 && (
+                        <Separator className='my-2' />
+                      )}
+                    </div>
+                  ))}
+                </ScrollArea>
+                <div className='flex justify-between'>
+                  <span className='font-semibold'>Total</span>
+                  <span className='font-semibold'>
+                    {new Intl.NumberFormat('id-ID', {
+                      style: 'currency',
+                      currency: 'IDR',
+                    }).format(
+                      cart.reduce((total, book) => total + book.price, 0)
+                    )}
+                  </span>
+                </div>
+                <Button
+                  size='sm'
+                  className='mt-2'
+                  onClick={() => handleOrder()}
+                  loading={isLoading}
+                >
+                  Beli
+                </Button>
+              </>
+            ) : (
+              <div className='flex items-center justify-center h-24'>
+                <span className='font-semibold text-sm text-center'>
+                  Keranjang kosong
+                </span>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className='py-4 w-full'>{children}</div>
     </div>
